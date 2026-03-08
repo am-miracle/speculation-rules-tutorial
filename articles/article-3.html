@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The real cost of a 1MB JS bundle — DevPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="../with-speculation.html">← Back</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back-link" href="javascript:history.back()">← Back to articles</a>
+
+    <article>
+      <div class="article-hero">
+        <div class="category">JavaScript</div>
+        <h1>The real cost of a 1MB JavaScript bundle</h1>
+        <div class="meta">9 min read · January 2025</div>
+      </div>
+
+      <div class="article-body">
+        <p>
+          A 1MB JavaScript bundle doesn't just cost you 1MB of transfer. It costs you parse time,
+          compile time, and execution time — and those costs scale with device capability, not connection
+          speed. That's why the same bundle can feel fast on a MacBook and unusable on a mid-range Android.
+        </p>
+
+        <h2>The three costs people forget</h2>
+        <p>
+          Transfer size is what most developers look at. But after the bytes arrive, the browser has to
+          parse the text into an AST, compile it to bytecode, and then execute it. On a Moto G4, that
+          process for a 1MB bundle can take 4–5 seconds. Gzipping gets you smaller transfer, but it
+          doesn't reduce parse and compile time — those operate on the uncompressed size.
+        </p>
+
+        <pre>// Measure script execution time
+const start = performance.now();
+// ... your code
+const end = performance.now();
+console.log(`Execution: ${end - start}ms`);</pre>
+
+        <h2>Code splitting is not optional</h2>
+        <p>
+          If you're shipping a monolithic bundle, you're paying the full parse and compile cost on every
+          page load, even for code that page will never run. Route-based code splitting is table stakes.
+          Dynamic imports for heavy features (charts, editors, date pickers) are the next step.
+        </p>
+
+        <div class="article-images">
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1618044733300-9472054094ee?w=800&q=80"
+              alt="JavaScript bundle analyzer output showing 1MB bundle breakdown by package" class="article-img"
+              loading="lazy" />
+            <figcaption>Bundle analyzer output · 1MB breakdown</figcaption>
+          </figure>
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80"
+              alt="Graph comparing parse time across device classes from high-end desktop to low-end mobile"
+              class="article-img" loading="lazy" />
+            <figcaption>Parse time by device class</figcaption>
+          </figure>
+        </div>
+
+        <h2>What actually moves the needle</h2>
+        <p>
+          In order: remove unused dependencies first (bundle-analyzer will shock you), then split routes,
+          then lazy-load heavy features. Tree shaking helps but it's often overstated — it can't remove
+          code that's genuinely imported, only code that's never referenced. Most real-world bundles have
+          more of the former.
+        </p>
+      </div>
+    </article>
+
+    <div id="perf-dashboard" style="margin-top: 3rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="../perf-logger.js"></script>
+</body>
+
+</html>

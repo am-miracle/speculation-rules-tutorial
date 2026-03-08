@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevPulse — Without Speculation Rules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ❌ NO SPECULATION RULES — control version -->
+</head>
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="without-speculation.html">Home</a>
+      <a href="https://github.com" target="_blank">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <div style="margin-bottom: 1rem;">
+        <span class="mode-badge off">
+          <span class="dot"></span>
+          Speculation Rules: OFF
+        </span>
+      </div>
+      <h1>Web Performance<br />Deep Dives</h1>
+      <p>Benchmarks, breakdowns, and real-world tests. No fluff.</p>
+    </div>
+
+    <a class="toggle-version" href="with-speculation.html">
+      → Switch to version WITH Speculation Rules
+    </a>
+
+    <p class="articles-label">Latest Articles</p>
+
+    <div class="article-grid">
+      <a class="article-card" href="articles/article-1.html">
+        <div class="tag">Performance</div>
+        <h3>Does the Speculation Rules API actually work?</h3>
+        <p>Real benchmarks, real numbers. I tested it so you don't have to.</p>
+      </a>
+
+      <a class="article-card" href="articles/article-2.html">
+        <div class="tag">Core Web Vitals</div>
+        <h3>LCP deep dive: why your largest element is slower than you think</h3>
+        <p>A breakdown of what actually counts, what doesn't, and how to fix it.</p>
+      </a>
+
+      <a class="article-card" href="articles/article-3.html">
+        <div class="tag">JavaScript</div>
+        <h3>The real cost of a 1MB JavaScript bundle</h3>
+        <p>Parse time, execution overhead, and what the waterfall actually shows.</p>
+      </a>
+
+      <a class="article-card" href="articles/article-4.html">
+        <div class="tag">Caching</div>
+        <h3>HTTP caching headers: what every developer gets wrong</h3>
+        <p>Cache-Control, ETags, stale-while-revalidate — explained properly.</p>
+      </a>
+
+      <a class="article-card" href="articles/article-5.html">
+        <div class="tag">Fonts</div>
+        <h3>Font loading strategies that don't destroy your CLS</h3>
+        <p>font-display, preloading, subsetting — a practical guide.</p>
+      </a>
+    </div>
+
+    <div id="perf-dashboard">
+      <h2>Performance Metrics</h2>
+      <p class="perf-note">Navigate to an article and come back — or navigate to an article to see its metrics.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="perf-logger.js"></script>
+</body>
+</html>

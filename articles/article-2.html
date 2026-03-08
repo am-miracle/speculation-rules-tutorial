@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LCP deep dive — DevPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="../with-speculation.html">← Back</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back-link" href="javascript:history.back()">← Back to articles</a>
+
+    <article>
+      <div class="article-hero">
+        <div class="category">Core Web Vitals</div>
+        <h1>LCP deep dive: why your largest element is slower than you think</h1>
+        <div class="meta">11 min read · February 2025</div>
+      </div>
+
+      <div class="article-body">
+        <p>
+          Largest Contentful Paint gets misunderstood more than any other Core Web Vital. Teams spend weeks
+          optimizing images and then wonder why their LCP score barely moved. Usually it's because they were
+          optimizing the wrong element.
+        </p>
+
+        <h2>What actually counts as the LCP element</h2>
+        <p>
+          The browser considers: images, <code>&lt;img&gt;</code> elements, <code>&lt;image&gt;</code> inside
+          SVGs, poster images on <code>&lt;video&gt;</code>, background images loaded via CSS, and blocks of
+          text. What it does NOT consider: SVG elements, <code>&lt;canvas&gt;</code>, or anything with
+          <code>opacity: 0</code>.
+        </p>
+
+        <p>
+          The LCP element can change during load. The browser keeps updating the candidate until the user
+          first interacts — then it locks in. This means your LCP element might not be what you assume.
+          Check it in DevTools, not in your head.
+        </p>
+
+        <h2>The four sub-parts of LCP</h2>
+        <p>
+          Chrome's LCP breakdown gives you four phases: Time to First Byte, resource load delay, resource
+          load time, and element render delay. Most teams only look at the total. That's why they keep
+          missing the actual bottleneck.
+        </p>
+
+        <pre>// Log LCP candidate in JS
+new PerformanceObserver((list) => {
+  const entries = list.getEntries();
+  const last = entries[entries.length - 1];
+  console.log('LCP element:', last.element);
+  console.log('LCP time:', last.startTime);
+}).observe({ type: 'largest-contentful-paint', buffered: true });</pre>
+
+        <div class="article-images">
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80"
+              alt="LCP waterfall breakdown showing 4 sub-parts: TTFB, resource load delay, resource load time, element render delay"
+              class="article-img" loading="lazy" />
+            <figcaption>LCP waterfall breakdown · 4 sub-parts</figcaption>
+          </figure>
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14431b9?w=800&q=80"
+              alt="Chrome DevTools showing LCP element highlighted in the Elements panel" class="article-img"
+              loading="lazy" />
+            <figcaption>DevTools LCP element highlight</figcaption>
+          </figure>
+        </div>
+
+        <h2>The fastest fix most teams ignore</h2>
+        <p>
+          If your LCP element is an image, add <code>&lt;link rel="preload" as="image"&gt;</code> for it
+          in the <code>&lt;head&gt;</code>. This is free performance. The browser discovers the image earlier
+          in the load waterfall and starts fetching it before it parses the full DOM. It's not glamorous
+          but it consistently cuts 200–400ms off LCP on image-heavy pages.
+        </p>
+      </div>
+    </article>
+
+    <div id="perf-dashboard" style="margin-top: 3rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="../perf-logger.js"></script>
+</body>
+
+</html>

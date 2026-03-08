@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Font loading strategies — DevPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="../with-speculation.html">← Back</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back-link" href="javascript:history.back()">← Back to articles</a>
+
+    <article>
+      <div class="article-hero">
+        <div class="category">Fonts</div>
+        <h1>Font loading strategies that don't destroy your CLS</h1>
+        <div class="meta">7 min read · November 2024</div>
+      </div>
+
+      <div class="article-body">
+        <p>
+          Custom fonts are one of the most reliable ways to tank your Cumulative Layout Shift score.
+          Text renders in a fallback font, the custom font loads, the text reflows, and CLS spikes.
+          There are several ways to prevent this, and most teams are using the wrong one.
+        </p>
+
+        <h2>font-display explained properly</h2>
+        <p>
+          <code>font-display: swap</code> is the most commonly recommended value, but it's not always
+          the right one. Swap shows fallback text immediately and swaps in the custom font when it loads —
+          which is great for FOIT (flash of invisible text) but can cause visible layout shift. For
+          body text, it's often the right trade-off. For display headings where CLS matters more,
+          consider <code>font-display: optional</code> instead.
+        </p>
+
+        <pre>@font-face {
+  font-family: 'MyFont';
+  src: url('/fonts/myfont.woff2') format('woff2');
+  font-display: swap; /* or: optional, fallback, block */
+}</pre>
+
+        <h2>size-adjust and ascent-override</h2>
+        <p>
+          These CSS descriptors let you tweak the metrics of your fallback font to match your custom
+          font more closely — reducing the visual jump when the swap happens. It's a bit tedious to
+          calibrate, but tools like the Font Style Matcher and the <code>@font-face</code> override
+          descriptors make it much more manageable.
+        </p>
+
+        <div class="article-images">
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80"
+              alt="Side-by-side comparison of FOIT (flash of invisible text) vs FOUT (flash of unstyled text)"
+              class="article-img" loading="lazy" />
+            <figcaption>FOIT vs FOUT comparison</figcaption>
+          </figure>
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80"
+              alt="Timeline diagram illustrating how font-display values (swap, optional, fallback, block) behave during font loading"
+              class="article-img" loading="lazy" />
+            <figcaption>font-display value behavior timeline</figcaption>
+          </figure>
+        </div>
+
+        <h2>Self-hosting vs Google Fonts</h2>
+        <p>
+          Google Fonts is convenient but it adds a cross-origin connection and gives you less control
+          over caching. Self-hosting your fonts — combined with <code>font-display: optional</code>
+          and aggressive caching headers — consistently beats Google Fonts on performance benchmarks.
+          The setup is a one-time cost that pays off on every page load.
+        </p>
+      </div>
+    </article>
+
+    <div id="perf-dashboard" style="margin-top: 3rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="../perf-logger.js"></script>
+</body>
+
+</html>

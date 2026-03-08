@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Does the Speculation Rules API actually work? — DevPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="../with-speculation.html">← Back</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back-link" href="javascript:history.back()">← Back to articles</a>
+
+    <article>
+      <div class="article-hero">
+        <div class="category">Performance</div>
+        <h1>Does the Speculation Rules API actually work?</h1>
+        <div class="meta">8 min read · March 2025</div>
+      </div>
+
+      <div class="article-body">
+        <p>
+          I've been skeptical of browser-level performance APIs ever since <code>rel="preload"</code>
+          turned out to be a footgun for half the teams I've seen use it. So when the Speculation Rules API
+          started showing up in Chrome release notes, I wanted to test it properly — not run Google's demo
+          and call it a day.
+        </p>
+
+        <p>
+          This article documents what I actually found. The short answer: it works, but only in specific
+          conditions, and the difference is far more dramatic with prerender than with prefetch.
+        </p>
+
+        <h2>What I measured</h2>
+        <p>
+          Using the Navigation Timing API (Level 2), I captured TTFB, DOM Content Loaded, full page load,
+          and the <code>activationStart</code> offset — which tells you if a page was activated from a
+          prerender cache rather than a fresh navigation.
+        </p>
+
+        <pre>const [nav] = performance.getEntriesByType('navigation');
+const wasPrerendered = nav.activationStart > 0;
+const perceivedLoad = Math.max(0, nav.loadEventEnd - nav.activationStart);</pre>
+
+        <p>
+          The <code>activationStart</code> value is key. When a page is prerendered, the browser starts
+          loading it before you click. By the time you navigate, it's already done. The activation offset
+          tells you how much head start the browser got.
+        </p>
+
+        <h2>The numbers</h2>
+        <p>
+          On Fast 3G with 4x CPU throttling (10 runs each, averaged), prerender reduced perceived page
+          load time by roughly 78% compared to a cold navigation. Prefetch alone was about 22% faster —
+          useful, but not remotely in the same league.
+        </p>
+
+        <div class="article-images">
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+              alt="Performance benchmark chart showing slow navigation without speculation rules (~1,840ms)"
+              class="article-img" loading="lazy" />
+            <figcaption>Without speculation · ~1,840ms</figcaption>
+          </figure>
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+              alt="Performance benchmark chart showing fast navigation with prerender (~390ms)" class="article-img"
+              loading="lazy" />
+            <figcaption>With prerender · ~390ms</figcaption>
+          </figure>
+        </div>
+
+        <p>
+          The perf dashboard on the homepage of this demo captures these metrics live. Navigate between
+          articles and compare the numbers yourself.
+        </p>
+
+        <h2>When prerender gets skipped</h2>
+        <p>
+          The browser reserves the right to skip prerendering if device memory is low, the user has
+          data-saver enabled, or the speculation rule targets too many pages at once. This is why
+          <code>eagerness: "moderate"</code> — which triggers on hover — is a safer bet than
+          <code>"eager"</code>, which prerenders everything immediately and can waste significant memory.
+        </p>
+      </div>
+    </article>
+
+    <div id="perf-dashboard" style="margin-top: 3rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="../perf-logger.js"></script>
+</body>
+
+</html>

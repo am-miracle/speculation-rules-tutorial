@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HTTP caching headers — DevPulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+
+  <header class="site-header">
+    <span class="logo">DevPulse</span>
+    <nav>
+      <a href="../with-speculation.html">← Back</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <a class="back-link" href="javascript:history.back()">← Back to articles</a>
+
+    <article>
+      <div class="article-hero">
+        <div class="category">Caching</div>
+        <h1>HTTP caching headers: what every developer gets wrong</h1>
+        <div class="meta">10 min read · December 2024</div>
+      </div>
+
+      <div class="article-body">
+        <p>
+          HTTP caching is one of those things where the basic concept is simple, but most teams get the
+          details wrong in production and end up either caching too aggressively (users see stale content)
+          or not at all (they pay full round-trip cost on every request). Both are fixable.
+        </p>
+
+        <h2>Cache-Control isn't one directive</h2>
+        <p>
+          Most developers know <code>max-age</code>. Far fewer understand <code>stale-while-revalidate</code>,
+          which is probably the most useful directive for dynamic content. It lets the browser serve a cached
+          response immediately while fetching a fresh one in the background — so the user never waits, and
+          they get updated content on the next load.
+        </p>
+
+        <pre>Cache-Control: max-age=60, stale-while-revalidate=300</pre>
+
+        <p>
+          This tells the browser: serve from cache for 60 seconds. After that, it's stale — but you can
+          still serve it for up to 5 minutes while refreshing in the background. After 5 minutes, go to
+          the network.
+        </p>
+
+        <h2>ETags vs. Last-Modified</h2>
+        <p>
+          Both are conditional request mechanisms — they let the browser ask the server "has this changed?"
+          instead of fetching the full response. ETags are more precise (they hash content rather than
+          relying on timestamps), but they require server-side computation. For static assets, both work
+          fine. For dynamic content, ETags are the safer choice.
+        </p>
+
+        <div class="article-images">
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80"
+              alt="Caching decision flowchart showing when to use Cache-Control directives" class="article-img"
+              loading="lazy" />
+            <figcaption>Caching decision flowchart</figcaption>
+          </figure>
+          <figure class="article-figure">
+            <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80"
+              alt="Network waterfall comparison: requests with and without proper cache headers" class="article-img"
+              loading="lazy" />
+            <figcaption>Network waterfall: with vs. without cache headers</figcaption>
+          </figure>
+        </div>
+
+        <h2>The immutable trick for static assets</h2>
+        <p>
+          If you fingerprint your assets (which every modern bundler does by default), you can set
+          <code>Cache-Control: max-age=31536000, immutable</code> — one year, and tell the browser it
+          will never change. The browser won't even bother with a conditional request. This is the right
+          setup for versioned JS/CSS files.
+        </p>
+      </div>
+    </article>
+
+    <div id="perf-dashboard" style="margin-top: 3rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    speculation-rules-demo · built for logrocket blog article
+  </footer>
+
+  <script src="../perf-logger.js"></script>
+</body>
+
+</html>
