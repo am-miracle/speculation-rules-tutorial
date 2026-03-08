@@ -1,7 +1,5 @@
 # speculation-rules-demo
 
-Demo project for the LogRocket blog article:
-**"Does the Speculation Rules API really boost web speed? I tested it."**
 
 ## What this is
 
