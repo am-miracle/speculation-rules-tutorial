@@ -14,15 +14,10 @@ Each article page includes a live **performance dashboard** powered by the Navig
 
 You need to serve this over HTTP — the Speculation Rules API does not work on `file://` URLs.
 
-**Option 1: npx serve**
 ```bash
-npx serve .
+node server.js
 ```
 
-**Option 2: Python**
-```bash
-python3 -m http.server 8080
-```
 
 Then open `http://localhost:8080` in Chrome (or any Chromium-based browser).
 
